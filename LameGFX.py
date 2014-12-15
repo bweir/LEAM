@@ -4,41 +4,47 @@ import os, sys
 import pygame
 from pygame.locals import *
 
-res_x = 128
-res_y = 64
+class LameGFX:
 
-def Start():
-    return true
+    res_x = 128
+    res_y = 64
 
-def WaitToDraw():
-    return true
+    def Start(self):
+        self.composer = pygame.Surface(
+                (self.res_x, self.res_y), flags=HWSURFACE)
+        return self.composer
 
-def ClearScreen(color):
-    return true
+    def WaitToDraw(self):
+        return
 
-def Blit(source):
-    return true
+    def ClearScreen(self,color):
+        return
 
-def Sprite(source, x, y, frame):
-    return true
+    def Blit(self,source):
+        return
 
-def InvertColor(enabled):
-    return true
+    def Sprite(self, source, x, y, frame):
+        print source, source.get_rect()
+        self.composer.blit(source, source.get_rect())
+        print "composer",self.composer
 
-def Map(tilemap, levelmap, offset_x, offset_y, x1, y1, x2, y2):
-    return true
+    def InvertColor(self,enabled):
+        return
 
-def LoadFont(sourcevar, startingcharvar, tilesize_xvar, tilesize_yvar):
-    return true
+    def Map(self,tilemap, levelmap, offset_x, offset_y, x1, y1, x2, y2):
+        return
 
-def PutChar(char, x, y):
-    return true
+    def LoadFont(self, sourcevar, startingcharvar, tilesize_xvar, tilesize_yvar):
+        return
 
-def PutString(stringvar, origin_x, origin_y):
-    return true
+    def PutChar(self,char, x, y):
+        return
 
-def TextBox(stringvar, origin_x, origin_y, w, h):
-    return true
+    def PutString(self,stringvar, origin_x, origin_y):
+        return
 
-def SetClipRectangle(clipx1, clipy1, clipx2, clipy2):
-    return true
+    def TextBox(self,stringvar, origin_x, origin_y, w, h):
+        return
+
+    def SetClipRectangle(self,clipx1, clipy1, clipx2, clipy2):
+        return

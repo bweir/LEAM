@@ -18,7 +18,6 @@ args = parser.parse_args()
 filenames = [ i for i in args.objects if os.path.splitext(i)[1] == '.spin' and os.path.isfile(i) ]
 
 def filter_comments(text):
-#    text = re.sub("{{.*?}}","",text, flags=re.MULTILINE|re.DOTALL)
     text = re.sub("{{(.*?)}}","",text, flags=re.MULTILINE|re.DOTALL)
     text = re.sub("{(.*?)}","",text, flags=re.MULTILINE|re.DOTALL)
     text = re.sub("'.*","",text)
@@ -27,7 +26,6 @@ def filter_comments(text):
     return text
 
 def filter_operators(text):
-#    text = re.sub("=(?![=\w ])",":=",text)
     text = re.sub(":=","=",text)
 
     return text
@@ -71,13 +69,12 @@ def function(text):
     if not re.search("\(.*\)", title):
         title += '()'
 
-    #text[1] = "def " + title + ":\n" + text[1]
-    text[1] = "def " + title + ":\n" + "    return true"
+    text[1] = "def " + title + ":\n" + text[1]
 
     return text[1]
 
 def data(text):
-    return ""
+    return text
 
 def variables(text):
     return text
