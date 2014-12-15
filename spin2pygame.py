@@ -78,16 +78,19 @@ def function(text):
     # eat sub-object hashes
     text[1] = re.sub("(\w+)#(\w+)","\g<1>.\g<2>", text[1])
 
-    # support inc/dec operators
-
+    # handle inc/dec operators
     text[1] = re.sub("(\w+)\+\+","\g<1> += 1", text[1])
     text[1] = re.sub("(\w+)--","\g<1> -= 1", text[1])
+
+    text[1] = re.sub("(\w+\[.+?\])\+\+","\g<1> += 1", text[1])
+    text[1] = re.sub("(\w+\[.+?\])--","\g<1> -= 1", text[1])
 
     # flow control
     text[1] = re.sub("(\s*)repeat([ \t]*)","\g<1>while True:", text[1])     # repeat
 
 
     text[1] = re.sub("(\s*if.*)[ \t]*","\g<1>:", text[1])     # repeat
+    text[1] = re.sub("(\s*else.*)[ \t]*","\g<1>:", text[1])     # repeat
 
     indentlevel = len(text[1].split('\n')[0]) - len(text[1].split('\n')[0].lstrip())
     print indentlevel, text[1]
@@ -105,6 +108,8 @@ def data(text):
     return ""
 
 def variables(text):
+    pat = re.compile('\n[\t\r\n ]*(byte|word|long)[ \t]*(\w+)')
+    text = re.sub(pat,"\g<2> = None\n",text)
     return text
 
 def constants(text):

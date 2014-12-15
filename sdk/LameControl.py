@@ -15,6 +15,11 @@ def Start():
 
 def Update():
     global keys
+    pygame.event.pump()
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
     keys = pygame.key.get_pressed()
 
 def A():
