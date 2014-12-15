@@ -3,13 +3,10 @@
 import os, sys, re
 
 import argparse
-import getpass
 
-import xmlrpclib
-
-
-parser = argparse.ArgumentParser(description='Generate Confluence API listing from Spin files.')
+parser = argparse.ArgumentParser(description='Run LameStation games on your desktop!')
 parser.add_argument('-L','--library', nargs=1, metavar='PATH', help='Path to Spin library directory')
+parser.add_argument('-r','--run', action='store_true', help='Run your freshly compiled game')
 parser.add_argument('objects', metavar='OBJECT', nargs='+', help='Spin files to convert to Python syntax')
 
 args = parser.parse_args()
@@ -69,12 +66,15 @@ def function(text):
     if not re.search("\(.*\)", title):
         title += '()'
 
+    # Add parentheses to function calls
+    text[1] = re.sub("(\w+\.\w+)(?![.a-zA-Z_\(])","\g<1>()", text[1])
+
     text[1] = "def " + title + ":\n" + text[1]
 
     return text[1]
 
 def data(text):
-    return text
+    return ""
 
 def variables(text):
     return text
@@ -117,19 +117,10 @@ else:
 
         textblock = split_into_blocks(f)
 
-
         # Zero out and initialize content variable
         content = {}
         for b in spinblocks.keys():
             content[b] = ""
-
-        print spinblocks.keys()
-
-        # See if code starts with named block or comments
-#        if textblock[0].split('\n')[1] in spinblocks.keys():
-#            startpoint = 0
-#        else:
-#            startpoint = 1
 
         # Process and render output for individual sections
         n = len(textblock)
@@ -143,8 +134,6 @@ else:
             if label in spinblocks.keys():
                 content[label] += spinblocks[label](textblock[i+1])
                 content[label] += "\n\n"
-
-            
             
         # Final Formatting
 
@@ -160,12 +149,19 @@ else:
 
         # add boiler plate
         template = open('template.py','r').read()
-        finalcontent = template + finalcontent
+        footer = open('footer.py','r').read()
+        finalcontent = template + finalcontent + footer
 
         print "Output!"
         print "------------------------------------------"
         print finalcontent
 
-        newfile = open(os.path.basename(filename)+'.py','w')
+        newfilename = os.path.basename(filename)+'.py'
+
+        newfile = open(newfilename,'w')
         newfile.write(finalcontent)
         newfile.close()
+
+
+        if args.run:
+            os.system("python "+newfilename)

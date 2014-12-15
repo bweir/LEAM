@@ -1,5 +1,5 @@
 {{
-Sprite  Command
+Sprite Frames
 -------------------------------------------------
 Version: 1.0
 Copyright (c) 2014 LameStation LLC
@@ -17,32 +17,20 @@ OBJ
 
     lcd     :               "LameLCD" 
     gfx     :               "LameGFX"
-    fn      :               "LameFunctions"
 
-    sprite  :               "gfx_supertank"
+    sprite  :               "gfx_radar"
 
 
-PUB Main
+PUB Main | frame
 
     lcd.Start(gfx.Start)
-
-    gfx.ClearScreen(0)
-    gfx.Sprite(sprite.Addr, 56, 24, 0)
-    lcd.DrawScreen
-
-    fn.Sleep(1000)
-
-    gfx.ClearScreen(0)
-    gfx.Sprite(sprite.Addr, 56, 24, 1)
-    lcd.InvertScreen(False)
-    lcd.DrawScreen
-
-    fn.Sleep(1000)
-
-    gfx.ClearScreen(0)
-    gfx.Sprite(sprite.Addr, 56, 24, 2)
-    lcd.InvertScreen(True)
-    lcd.DrawScreen
+    lcd.SetFrameLimit(lcd#QUARTERSPEED)
+    repeat
+        gfx.Sprite(sprite.Addr, 56, 24, frame)
+        lcd.DrawScreen
+        frame++
+        if frame > 15
+            frame := 0
     
 DAT
 {{

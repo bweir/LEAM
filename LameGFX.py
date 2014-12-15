@@ -4,47 +4,59 @@ import os, sys
 import pygame
 from pygame.locals import *
 
-class LameGFX:
+res_x = 128
+res_y = 64
 
-    res_x = 128
-    res_y = 64
+BLACK = (0,0,0)
+WHITE = (255,255,255)
+TRANSPARENT = (255,0,255)
+GRAY = (128,128,128)
 
-    def Start(self):
-        self.composer = pygame.Surface(
-                (self.res_x, self.res_y), flags=HWSURFACE)
-        return self.composer
+composer = None
+inverted = False
 
-    def WaitToDraw(self):
-        return
+def Start():
+    global composer
+    composer = pygame.Surface((res_x, res_y))
+    return composer
 
-    def ClearScreen(self,color):
-        return
+def WaitToDraw():
+    return
 
-    def Blit(self,source):
-        return
+def ClearScreen(color):
+    composer.fill(color)
 
-    def Sprite(self, source, x, y, frame):
-        print source, source.get_rect()
-        self.composer.blit(source, source.get_rect())
-        print "composer",self.composer
+def Blit(source):
+    Sprite(source, 0, 0, 0)
 
-    def InvertColor(self,enabled):
-        return
+def Sprite(source, x, y, frame):
+    source['image'].set_colorkey(TRANSPARENT)
+    xpos = frame % (source['image'].get_width()/source['width']) * source['width']
+    ypos = frame / (source['image'].get_width()/source['width']) * source['height']
 
-    def Map(self,tilemap, levelmap, offset_x, offset_y, x1, y1, x2, y2):
-        return
+    composer.blit(
+            source['image'],
+            (x,y),
+            (xpos, ypos,source['width'],source['height']))
 
-    def LoadFont(self, sourcevar, startingcharvar, tilesize_xvar, tilesize_yvar):
-        return
+def InvertColor(enabled):
+    global inverted
+    inverted = enabled
 
-    def PutChar(self,char, x, y):
-        return
+def Map(tilemap, levelmap, offset_x, offset_y, x1, y1, x2, y2):
+    return
 
-    def PutString(self,stringvar, origin_x, origin_y):
-        return
+def LoadFont(sourcevar, startingcharvar, tilesize_xvar, tilesize_yvar):
+    return
 
-    def TextBox(self,stringvar, origin_x, origin_y, w, h):
-        return
+def PutChar(char, x, y):
+    return
 
-    def SetClipRectangle(self,clipx1, clipy1, clipx2, clipy2):
-        return
+def PutString(stringvar, origin_x, origin_y):
+    return
+
+def TextBox(stringvar, origin_x, origin_y, w, h):
+    return
+
+def SetClipRectangle(clipx1, clipy1, clipx2, clipy2):
+    return
