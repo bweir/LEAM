@@ -24,7 +24,7 @@ OBJ
     gfx     :               "LameGFX" 
     ctrl    :               "LameControl"
     
-    sprite  :               "gfx_happyface"
+    sprite  :               "gfx_happyface_full"
     font    :               "gfx_font6x8"
 
 VAR

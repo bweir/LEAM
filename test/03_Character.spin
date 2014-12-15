@@ -23,7 +23,7 @@ OBJ
 VAR
     byte    apress
 
-PUB Main | dir,frame
+PUB Character | dir,frame
 
     lcd.Start(gfx.Start)
     lcd.SetFrameLimit(lcd#QUARTERSPEED)
