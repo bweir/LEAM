@@ -17,27 +17,29 @@ OBJ
 
     lcd     :               "LameLCD" 
     gfx     :               "LameGFX"
+    ctrl    :               "LameControl"
     fn      :               "LameFunctions"
 
     sprite  :               "gfx_supertank"
+
 
 
 PUB Main
 
     lcd.Start(gfx.Start)
 
-    gfx.ClearScreen(0)
+    gfx.ClearScreen(gfx#BLACK)
     gfx.Sprite(sprite.Addr, 56, 24, 0)
     lcd.DrawScreen
 
-    fn.Sleep(1000)
+    ctrl.WaitKey()
 
-    gfx.ClearScreen(0)
+    gfx.ClearScreen(gfx#WHITE)
     gfx.Sprite(sprite.Addr, 56, 24, 1)
     lcd.InvertScreen(False)
     lcd.DrawScreen
 
-    fn.Sleep(1000)
+    ctrl.WaitKey()
 
     gfx.ClearScreen(0)
     gfx.Sprite(sprite.Addr, 56, 24, 2)

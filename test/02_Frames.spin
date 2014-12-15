@@ -29,6 +29,8 @@ PUB Main | frame
         gfx.Sprite(sprite.Addr, 56, 24, frame)
         lcd.DrawScreen
         frame++
+        frame--
+        frame++
         if frame > 15
             frame := 0
     

@@ -7,9 +7,6 @@ from pygame.locals import *
 SCREEN_W = 128
 SCREEN_H = 64
 BITSPERPIXEL = 2
-SCREEN_H_BYTES = SCREEN_H / 8
-SCREENSIZE_BYTES = SCREEN_W * SCREEN_H_BYTES * BITSPERPIXEL
-TOTALBUFFER_BYTES = SCREENSIZE_BYTES
 FULLSPEED = 40
 HALFSPEED = 20
 QUARTERSPEED = 10
@@ -19,6 +16,9 @@ SCALAR = 4
 composer = None
 screen = None
 inverted = False
+
+clock = pygame.time.Clock()
+speed = 0
 
 def Start(framebuffer):
     global composer
@@ -41,8 +41,12 @@ def DrawScreen():
         del pixels
 
     pygame.display.update()
+    if speed > 0:
+        clock.tick(speed)
 
 def SetFrameLimit(frequency):
+    global speed
+    speed = frequency
     return
 
 def InvertScreen(enabled):

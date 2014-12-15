@@ -57,6 +57,8 @@ def function(text):
     print "  ",alias
     print "  ",temps
 
+
+
     # Fix aliases
     if not alias == "":
         text[1] = re.sub(alias,"result",text[1])
@@ -69,7 +71,29 @@ def function(text):
     # Add parentheses to function calls
     text[1] = re.sub("(\w+\.\w+)(?![.a-zA-Z_\(])","\g<1>()", text[1])
 
-    text[1] = "def " + title + ":\n" + text[1]
+    # eat sub-object hashes
+    text[1] = re.sub("(\w+)#(\w+)","\g<1>.\g<2>", text[1])
+
+    # support inc/dec operators
+
+    text[1] = re.sub("(\w+)\+\+","\g<1> += 1", text[1])
+    text[1] = re.sub("(\w+)--","\g<1> -= 1", text[1])
+
+    # flow control
+    text[1] = re.sub("(\s*)repeat([ \t]*)","\g<1>while True:", text[1])     # repeat
+
+
+    text[1] = re.sub("(\s*if.*)[ \t]*","\g<1>:", text[1])     # repeat
+
+    indentlevel = len(text[1].split('\n')[0]) - len(text[1].split('\n')[0].lstrip())
+    print indentlevel, text[1]
+
+    # add function header
+    header = "def " + title + ":\n"
+    for t in temps:
+        header += " "*indentlevel + t + " = 0\n"
+
+    text[1] = header + text[1]
 
     return text[1]
 
