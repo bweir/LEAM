@@ -12,7 +12,11 @@ parser.add_argument('objects', metavar='OBJECT', nargs='+', help='Spin files to 
 args = parser.parse_args()
 
 # Filter out non-spin, non-file arguments
-filenames = [ i for i in args.objects if os.path.splitext(i)[1] == '.spin' and os.path.isfile(i) ]
+filenames = [ i for i in args.objects if os.path.splitext(i)[1] == '.spin' or os.path.splitext(i)[1] == '.py' and os.path.isfile(i) ]
+
+def run_game(filename):
+    os.system("PYTHONPATH=sdk python "+filename)
+
 
 def filter_comments(text):
     text = re.sub("{{(.*?)}}","",text, flags=re.MULTILINE|re.DOTALL)
@@ -135,6 +139,10 @@ else:
 
     for filename in filenames:
 
+        if os.path.splitext(filename)[1] == '.py':
+            run_game(filename)
+            continue
+
         f = open(filename).read()
 
         f = filter_comments(f)
@@ -188,4 +196,4 @@ else:
 
 
         if args.run:
-            os.system("python "+newfilename)
+            run_game(newfilename)
