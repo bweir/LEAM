@@ -6,18 +6,8 @@ import argparse
 
 firstfunction = None
 
-parser = argparse.ArgumentParser(description='Run LameStation games on your desktop!')
-parser.add_argument('-L','--library', nargs=1, metavar='PATH', help='Path to Spin library directory')
-parser.add_argument('-r','--run', action='store_true', help='Run your freshly compiled game')
-parser.add_argument('objects', metavar='OBJECT', nargs='+', help='Spin files to convert to Python syntax')
-
-args = parser.parse_args()
-
-# Filter out non-spin, non-file arguments
-filenames = [ i for i in args.objects if os.path.splitext(i)[1] == '.spin' or os.path.splitext(i)[1] == '.py' and os.path.isfile(i) ]
-
-def run_game(filename):
-    os.system("PYTHONPATH=sdk python "+filename)
+def run_game(library, filename):
+    os.system("PYTHONPATH="+library+" python "+filename)
 
 
 def filter_comments(text):
@@ -39,7 +29,7 @@ def filter_operators(text):
 
     return text
 
-def function(text):
+def function(text, label):
     text = text.split('\n',1)
     prototype = text[0]
     if ':' in prototype:
@@ -127,10 +117,10 @@ def function(text):
 
     return text[1]
 
-def data(text):
+def data(text, label):
     return ""
 
-def variables(text):
+def variables(text, label):
     pat = re.compile('\n[\t ]*(byte|word|long)[ \t]+(\w+)\[(.+?)\].*')
     text = re.sub(pat,"\n\g<2> = [0]*\g<3>",text)
     pat = re.compile('\n[\t ]*(byte|word|long)[ \t]+(\w+).*')
@@ -138,14 +128,14 @@ def variables(text):
 
     return text
 
-def constants(text):
+def constants(text, label):
     text = re.sub("[\t ]*(.*)","\g<1>",text)
 
     text = re.sub("[\t ]*_clkmode(.*)","",text)
     text = re.sub("[\t ]*_xinfreq(.*)","",text)
     return text
 
-def objects(text):
+def objects(text, label):
     text = re.sub("\n[\t ]*(.*)[\t ]*:[ \t]*\"(.+?)\"","\nimport \g<2> as \g<1>",text)
     text = re.sub("/",".",text)
     return text
@@ -164,68 +154,71 @@ spinblocks = {
 def split_into_blocks(text):
     return filter(None, re.split('(\nPUB)|(\nDAT)|(\nPRI)|(\nVAR)|(\nCON)|(\nOBJ)',text))
 
+def compile(library, filenames, run=False):
+
+    # Filter out non-spin, non-file arguments
+    filenames = [ i for i in filenames if os.path.splitext(i)[1] == '.spin' or os.path.splitext(i)[1] == '.py' and os.path.isfile(i) ]
+
+    # Only do anything if files are valid
+    if not filenames:
+        print "No valid files selected"
+    else:
+
+        for filename in filenames:
+
+            if os.path.splitext(filename)[1] == '.py':
+                run_game(library, filename)
+                continue
+
+            f = open(filename).read()
+
+            f = filter_comments(f)
+
+            textblock = split_into_blocks(f)
+
+            # Zero out and initialize content variable
+            content = {}
+            for b in spinblocks.keys():
+                content[b] = ""
+
+            ## This code assumes that there is code before your main code
+            for i in xrange(0,len(textblock)-1,2):
+                label = textblock[i].split('\n')[1]
+                print label
+                if label in spinblocks.keys():
+                    content[label] += spinblocks[label](textblock[i+1], label)
+                    content[label] += "\n\n"
+
+            # Final Formatting
+
+            # Assemble pieces into final page for upload
+            finalcontent = ""
+            finalcontent += content['OBJ']
+            finalcontent += content['CON']
+            finalcontent += content['VAR']
+            finalcontent += content['PRI']
+            finalcontent += content['PUB']
+            finalcontent += content['DAT']
 
 
-# Only do anything if files are valid
-if not filenames:
-    print "No valid files selected"
-else:
+            # add boiler plate
+            template = open('templates/game.py','r').read()
+            footer = open('templates/footer.py','r').read()
+            assembled =  template
+            assembled += finalcontent 
+            assembled += "\n" + firstfunction + "()\n"
+            assembled += footer
 
-    for filename in filenames:
+            print "Output!"
+            print "------------------------------------------"
+            print assembled
 
-        if os.path.splitext(filename)[1] == '.py':
-            run_game(filename)
-            continue
+            newfilename = os.path.basename(filename)+'.py'
 
-        f = open(filename).read()
-
-        f = filter_comments(f)
-
-        textblock = split_into_blocks(f)
-
-        # Zero out and initialize content variable
-        content = {}
-        for b in spinblocks.keys():
-            content[b] = ""
-
-        ## This code assumes that there is code before your main code
-        for i in xrange(0,len(textblock)-1,2):
-            label = textblock[i].split('\n')[1]
-            print label
-            if label in spinblocks.keys():
-                content[label] += spinblocks[label](textblock[i+1])
-                content[label] += "\n\n"
-
-        # Final Formatting
-
-        # Assemble pieces into final page for upload
-        finalcontent = ""
-        finalcontent += content['OBJ']
-        finalcontent += content['CON']
-        finalcontent += content['VAR']
-        finalcontent += content['PRI']
-        finalcontent += content['PUB']
-        finalcontent += content['DAT']
+            newfile = open(newfilename,'w')
+            newfile.write(assembled)
+            newfile.close()
 
 
-        # add boiler plate
-        template = open('template.py','r').read()
-        footer = open('footer.py','r').read()
-        assembled =  template
-        assembled += finalcontent 
-        assembled += "\n" + firstfunction + "()\n"
-        assembled += footer
-
-        print "Output!"
-        print "------------------------------------------"
-        print assembled
-
-        newfilename = os.path.basename(filename)+'.py'
-
-        newfile = open(newfilename,'w')
-        newfile.write(assembled)
-        newfile.close()
-
-
-        if args.run:
-            run_game(newfilename)
+            if run:
+                run_game(library, newfilename)
