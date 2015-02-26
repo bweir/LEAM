@@ -6,8 +6,8 @@ import argparse
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Run LameStation games on your desktop!')
-    parser.add_argument('-L','--library', nargs=1, metavar='PATH', help='Path to Spin library directory')
-    parser.add_argument('-r','--run', action='store_true', help='Run your freshly compiled game')
+    parser.add_argument('-L',nargs=1, metavar='PATH', help='Path to Spin library directory')
+    parser.add_argument('-r',action='store_true', help='Run your freshly compiled game')
     parser.add_argument('objects', metavar='OBJECT', nargs='+', help='Spin files to convert to Python syntax')
 
     args = parser.parse_args()
