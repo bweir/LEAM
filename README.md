@@ -1,5 +1,4 @@
-LEAM
-====
+# LEAM
 
 LEAM can take LameStation games written with the LameStation SDK and
 turn them into games that can be run on your desktop.
@@ -7,14 +6,11 @@ turn them into games that can be run on your desktop.
 Want to share your awesome game with your friends but they don't have a
 LameStation? No problem! LEAM it up!
 
-.. figure:: screenshots/SpriteDemo.spin.py_015.png
-   :alt: gratuitous screenshot
+![](screenshots/SpriteDemo.spin.py_015.png)
 
-   gratuitous screenshot
 *SpriteDemo.spin running on Ubuntu.*
 
-The name
-~~~~~~~~
+## The name
 
 It's pronounced LEEEEEEM! It's like Steam for LameStation. I think.
 

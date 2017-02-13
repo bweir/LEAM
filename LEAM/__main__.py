@@ -1,14 +1,20 @@
 #!/usr/bin/env python
 
-import os, sys, re
-
-import argparse
+import os
+import sys
+import re
+import click
 
 firstfunction = None
 
-def run_game(library, filename):
-    os.system("PYTHONPATH="+library+" python "+filename)
+def write(text, filename):
+    f = open(filename,'w')
+    f.write(text)
+    f.close()
 
+def run_game(libraries, filename):
+    libraries = ":".join(libraries)
+    os.system("PYTHONPATH="+libraries+" python "+filename)
 
 def filter_comments(text):
     text = re.sub("{{(.*?)}}","",text, flags=re.MULTILINE|re.DOTALL)
@@ -54,11 +60,6 @@ def function(text, label):
 
     title = title.strip()
     alias = alias.strip()
-
-    print title
-    print "  ",alias
-    print "  ",temps
-
 
     if label == 'PUB':
         global firstfunction
@@ -154,71 +155,72 @@ spinblocks = {
 def split_into_blocks(text):
     return filter(None, re.split('(\nPUB)|(\nDAT)|(\nPRI)|(\nVAR)|(\nCON)|(\nOBJ)',text))
 
-def compile(library, filenames, run=False):
+def compile(libraries, filename, run=False):
 
-    # Filter out non-spin, non-file arguments
-    filenames = [ i for i in filenames if os.path.splitext(i)[1] == '.spin' or os.path.splitext(i)[1] == '.py' and os.path.isfile(i) ]
+    f = open(filename).read()
 
-    # Only do anything if files are valid
-    if not filenames:
-        print "No valid files selected"
-    else:
+    f = filter_comments(f)
 
-        for filename in filenames:
+    textblock = split_into_blocks(f)
 
-            if os.path.splitext(filename)[1] == '.py':
-                run_game(library, filename)
-                continue
+    # Zero out and initialize content variable
+    content = {}
+    for b in spinblocks.keys():
+        content[b] = ""
 
-            f = open(filename).read()
+    ## This code assumes that there is code before your main code
+    for i in xrange(0,len(textblock)-1,2):
+        label = textblock[i].split('\n')[1]
+        #print label
+        if label in spinblocks.keys():
+            content[label] += spinblocks[label](textblock[i+1], label)
+            content[label] += "\n\n"
 
-            f = filter_comments(f)
+    # Final Formatting
 
-            textblock = split_into_blocks(f)
-
-            # Zero out and initialize content variable
-            content = {}
-            for b in spinblocks.keys():
-                content[b] = ""
-
-            ## This code assumes that there is code before your main code
-            for i in xrange(0,len(textblock)-1,2):
-                label = textblock[i].split('\n')[1]
-                print label
-                if label in spinblocks.keys():
-                    content[label] += spinblocks[label](textblock[i+1], label)
-                    content[label] += "\n\n"
-
-            # Final Formatting
-
-            # Assemble pieces into final page for upload
-            finalcontent = ""
-            finalcontent += content['OBJ']
-            finalcontent += content['CON']
-            finalcontent += content['VAR']
-            finalcontent += content['PRI']
-            finalcontent += content['PUB']
-            finalcontent += content['DAT']
+    # Assemble pieces into final page for upload
+    finalcontent = ""
+    finalcontent += content['OBJ']
+    finalcontent += content['CON']
+    finalcontent += content['VAR']
+    finalcontent += content['PRI']
+    finalcontent += content['PUB']
+    finalcontent += content['DAT']
 
 
-            # add boiler plate
-            template = open('templates/game.py','r').read()
-            footer = open('templates/footer.py','r').read()
-            assembled =  template
-            assembled += finalcontent 
-            assembled += "\n" + firstfunction + "()\n"
-            assembled += footer
+    # add boiler plate
+    template = open('templates/game.py','r').read()
+    footer = open('templates/footer.py','r').read()
+    out =  template
+    out += finalcontent 
+    out += "\n" + firstfunction + "()\n"
+    out += footer
 
-            print "Output!"
-            print "------------------------------------------"
-            print assembled
+    return out
 
-            newfilename = os.path.basename(filename)+'.py'
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
-            newfile = open(newfilename,'w')
-            newfile.write(assembled)
-            newfile.close()
+@click.command(context_settings=CONTEXT_SETTINGS)
+@click.option('--library', '-L', metavar='PATH', multiple=True, type=str, help='path to spin library directory')
+@click.option('--dump', '-d', is_flag=True, help='print generated file')
+@click.option('--run', '-r', is_flag=True, help='run compiled game')
+@click.argument('filename', type=click.Path(exists=True))
+def cli(library, run, dump, filename):
+    """Run LameStation games on the desktop."""
 
+    libraries = list(library)
+    libraries.insert(0, u'.')
+    out = compile(libraries, filename, True)
 
-            if run:
-                run_game(library, newfilename)
+    if dump:
+        print out
+
+    newfilename = os.path.basename(filename)+'.py'
+
+    write(out, newfilename)
+
+    if run:
+        run_game(libraries, newfilename)
+
+if __name__ == '__main__':
+    cli()

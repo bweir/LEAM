@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-with open('README.rst') as f:
+with open('README.md') as f:
         long_description = f.read()
 
 setup(
@@ -13,9 +13,13 @@ setup(
         license = "GPLv3",
         url = "https://github.com/lamestation/LEAM",
         keywords = "emulator game converter lamestation desktop python spin",
+        entry_points = {
+            'console_scripts': [
+                'leam = LEAM.__main__:cli'
+            ]
+        },
         packages=find_packages(),
         include_package_data=True,
-        scripts=['bin/leam'],
         classifiers=[
             "Environment :: Console",
             "Development Status :: 1 - Planning",

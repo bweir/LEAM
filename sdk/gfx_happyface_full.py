@@ -1,4 +1,3 @@
-#/usr/bin/env python
 import pygame
 sprite = {}
 sprite['image']  = pygame.image.load("test/happyface_full.png")
