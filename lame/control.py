@@ -3,7 +3,7 @@ import os, sys
 import pygame
 from pygame.locals import *
 
-import LameFunctions as fn      
+import lame.functions as fn      
 
 pygame.init()
 

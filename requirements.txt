@@ -1,2 +1,4 @@
-pygame
 click
+pygame
+pyinstaller
+sh

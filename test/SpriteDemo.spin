@@ -20,9 +20,9 @@ CON
 
 OBJ
 
-    lcd     :               "LameLCD" 
-    gfx     :               "LameGFX" 
-    ctrl    :               "LameControl"
+    lcd     :               "lame.lcd" 
+    gfx     :               "lame.gfx" 
+    ctrl    :               "lame.control"
     
     sprite  :               "gfx_happyface_full"
     font    :               "gfx_font6x8"

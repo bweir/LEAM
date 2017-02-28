@@ -1,18 +1,35 @@
-# LEAM
+# LameMaker
 
-LEAM can take LameStation games written with the LameStation SDK and
-turn them into games that can be run on your desktop.
+LameMaker can turn LameStation games written in Spin into standalone
+executables that can be run on a desktop computer. Because how cool is that!
 
 Want to share your awesome game with your friends but they don't have a
-LameStation? No problem! LEAM it up!
+LameStation? No problem! LameMake it!
 
 ![](screenshots/SpriteDemo.spin.py_015.png)
 
 *SpriteDemo.spin running on Ubuntu.*
 
-## The name
+## Installation
 
-It's pronounced LEEEEEEM! It's like Steam for LameStation. I think.
+Set up the virtual environment.
 
-LEAM isn't exactly a recursive acronym that standards for "LEAM isn't
-Exactly An eMulator."
+    . virtualenv.sh
+
+Install system dependencies.
+
+    sudo apt-get install upx-ucl
+
+Install python dependencies.
+
+    pip install -r requirements.txt
+
+## Usage
+
+Here is a sample you can run right now.
+
+    lamemaker -b -L lame -L media test/SpriteDemo.spin 
+
+`SpriteDemo` will appear in the `dist/` directory. Run it like so:
+
+    ./dist/SpriteDemo

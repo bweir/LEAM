@@ -1,20 +1,47 @@
-#!/usr/bin/env python
+import click
 
 import os
-import sys
 import re
-import click
+import stat
+import sys
+import sh
 
 firstfunction = None
 
-def write(text, filename):
+def write_game(text, filename):
     f = open(filename,'w')
     f.write(text)
+    st = os.stat(filename)
+    os.chmod(filename, st.st_mode | stat.S_IEXEC)
     f.close()
 
 def run_game(libraries, filename):
     libraries = ":".join(libraries)
     os.system("PYTHONPATH="+libraries+" python "+filename)
+
+def match_log(level, line):
+    return re.match(r'^\w+:\s*\d+\s+'+level, line)
+
+def color_log(app, line):
+    line = app+": "+line.rstrip()
+    if match_log('INFO',line):
+        return click.style(line, bold=True, fg='green')
+    elif match_log('WARNING',line):
+        return click.style(line, bold=True, fg='yellow')
+    elif match_log('ERROR',line):
+        return click.style(line, bold=True, fg='red')
+    else:
+        return click.style(line, fg='green')
+
+def build_game(libraries, filename):
+    paths = []
+    for library in libraries:
+        paths += ['-p',library]
+    for line in sh.pyinstaller(paths+[filename,'--onefile'],
+            _err_to_out=True, _iter=True):
+        click.echo(color_log('pyinstaller', line))
+
+    os.remove(os.path.join(os.getcwd(), os.path.basename(os.path.splitext(filename)[0]+'.spec')))
 
 def filter_comments(text):
     text = re.sub("{{(.*?)}}","",text, flags=re.MULTILINE|re.DOTALL)
@@ -189,8 +216,9 @@ def compile(libraries, filename, run=False):
 
 
     # add boiler plate
-    template = open('templates/game.py','r').read()
-    footer = open('templates/footer.py','r').read()
+    templatedir = os.path.join(os.path.dirname(__file__),'templates')
+    template = open(os.path.join(templatedir, 'game.py'),'r').read()
+    footer = open(os.path.join(templatedir,'footer.py'),'r').read()
     out =  template
     out += finalcontent 
     out += "\n" + firstfunction + "()\n"
@@ -204,23 +232,35 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('--library', '-L', metavar='PATH', multiple=True, type=str, help='path to spin library directory')
 @click.option('--dump', '-d', is_flag=True, help='print generated file')
 @click.option('--run', '-r', is_flag=True, help='run compiled game')
+@click.option('--build', '-b', is_flag=True, help='build standalone binary')
+@click.option('--output','-o',metavar='PATH', type=click.Path(), default=os.path.join(os.getcwd(),'out'), help='output directory of resulting game')
 @click.argument('filename', type=click.Path(exists=True))
-def cli(library, run, dump, filename):
+def cli(library, dump, run, build, output, filename):
     """Run LameStation games on the desktop."""
 
     libraries = list(library)
     libraries.insert(0, u'.')
     out = compile(libraries, filename, True)
 
+    output = os.path.realpath(output)
+
+    print output
+    if os.path.exists(output):
+        click.confirm("Are you sure you want to overwrite this directory?")
+
     if dump:
         print out
 
-    newfilename = os.path.basename(filename)+'.py'
-
-    write(out, newfilename)
+    newfilename = os.path.splitext(filename)[0]+'.py'
+    write_game(out, newfilename)
 
     if run:
         run_game(libraries, newfilename)
+
+    if build:
+        build_game(libraries, newfilename)
+
+    os.remove(newfilename)
 
 if __name__ == '__main__':
     cli()

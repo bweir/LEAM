@@ -15,8 +15,8 @@ CON
 
 OBJ
 
-    lcd     :               "LameLCD" 
-    gfx     :               "LameGFX"
+    lcd     :               "lame.lcd" 
+    gfx     :               "lame.gfx"
 
     sprite  :               "gfx_radar"
 
