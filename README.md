@@ -6,10 +6,6 @@ executables that can be run on a desktop computer. Because how cool is that!
 Want to share your awesome game with your friends but they don't have a
 LameStation? No problem! LameMake it!
 
-![](screenshots/SpriteDemo.spin.py_015.png)
-
-*SpriteDemo.spin running on Ubuntu.*
-
 ## Installation
 
 Set up the virtual environment.
@@ -33,3 +29,7 @@ Here is a sample you can run right now.
 `SpriteDemo` will appear in the `dist/` directory. Run it like so:
 
     ./dist/SpriteDemo
+
+Here it goes!
+
+![](screenshots/dist-SpriteDemo.png)
