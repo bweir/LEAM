@@ -2,3 +2,6 @@ click
 pygame
 pyinstaller
 sh
+sphinx
+
+
