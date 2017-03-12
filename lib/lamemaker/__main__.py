@@ -180,7 +180,7 @@ spinblocks = {
 
 
 def split_into_blocks(text):
-    return filter(None, re.split('(\nPUB)|(\nDAT)|(\nPRI)|(\nVAR)|(\nCON)|(\nOBJ)',text))
+    return [_f for _f in re.split('(\nPUB)|(\nDAT)|(\nPRI)|(\nVAR)|(\nCON)|(\nOBJ)',text) if _f]
 
 def compile(libraries, filename, run=False):
 
@@ -192,14 +192,14 @@ def compile(libraries, filename, run=False):
 
     # Zero out and initialize content variable
     content = {}
-    for b in spinblocks.keys():
+    for b in list(spinblocks.keys()):
         content[b] = ""
 
     ## This code assumes that there is code before your main code
-    for i in xrange(0,len(textblock)-1,2):
+    for i in range(0,len(textblock)-1,2):
         label = textblock[i].split('\n')[1]
         #print label
-        if label in spinblocks.keys():
+        if label in list(spinblocks.keys()):
             content[label] += spinblocks[label](textblock[i+1], label)
             content[label] += "\n\n"
 
@@ -239,19 +239,20 @@ def cli(library, dump, run, build, output, filename):
     """Run LameStation games on the desktop."""
 
     libraries = list(library)
-    libraries.insert(0, u'.')
+    libraries.insert(0, '.')
     out = compile(libraries, filename, True)
 
     output = os.path.realpath(output)
 
-    print output
+    print(output)
     if os.path.exists(output):
         click.confirm("Are you sure you want to overwrite this directory?")
 
     if dump:
-        print out
+        print(out)
 
     newfilename = os.path.splitext(filename)[0]+'.py'
+    print(newfilename)
     write_game(out, newfilename)
 
     if run:
@@ -260,7 +261,7 @@ def cli(library, dump, run, build, output, filename):
     if build:
         build_game(libraries, newfilename)
 
-    os.remove(newfilename)
+#    os.remove(newfilename)
 
 if __name__ == '__main__':
     cli()

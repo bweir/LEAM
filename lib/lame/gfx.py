@@ -1,3 +1,5 @@
+from lame import log
+
 import pygame
 from pygame.locals import *
 
@@ -82,7 +84,7 @@ def load(filename, width=None, height=None):
     if filename in _images:
         return _images[filename]
 
-    print "Loading",filename
+    log.info("Loading "+filename)
 
     d = {}
     d['image'] = pygame.image.load(filename)
@@ -99,9 +101,9 @@ def load(filename, width=None, height=None):
     else:
         d['frameh'] = d['h']
 
-    d['framex'] = d['w']/d['framew']
-    d['framey'] = d['h']/d['frameh']
-
+#    d['framex'] = d['w'] // d['framew']
+#    d['framey'] = d['h'] // d['frameh']
+#
     _images[filename] = d
     return d
 
@@ -116,8 +118,9 @@ def blit(source):
 
 def sprite(source, x, y, frame):
     source['image'].set_colorkey(TRANSPARENT)
-    xpos = frame % source['framex'] * source['framew']
-    ypos = frame / source['framex'] * source['frameh']
+    framex = source['w'] // source['framew']
+    xpos = frame % framex * source['framew']
+    ypos = frame // framex * source['frameh']
 
     composer.blit(
             source['image'],(x,y),

@@ -1,5 +1,7 @@
 from lame import gfx
 from lame import ctrl
+from lame import txt
+from lame import log
 
 import random
 
@@ -12,8 +14,13 @@ player = gfx.load('gfx/frappy.png', 16, 16)
 title = gfx.load('gfx/frappybird.png')
 youdied = gfx.load('gfx/youdie.png')
 pressa = gfx.load('gfx/pressa.png')
-#font = gfx.load('gfx/numbers.png')
 
+font = txt.load('gfx/font4x6.png', 4, 6, ' ')
+
+#log.error("This is a message")
+#log.debug("This is a message")
+#log.info("This is a message")
+#log.warn("This is a message")
 
 PIPE_TOP = 3
 PIPE_MID = 5
@@ -52,7 +59,7 @@ intarray = [0]*4
 
 def put_parallax_tile(x, y, speed, tile):
     t = 0
-    dx = 16/speed - 1
+    dx = 16 // speed - 1
     x = (x >> dx) & int("0xF",0)
     for t in range(0, 144, 16):
         put_tile(t-x, y, tile)
@@ -101,6 +108,7 @@ def game_loop():
     playery = 32
     score = 0
     init_pipes()
+
     while not died:
         ctrl.update()
         gfx.clear(gfx.WHITE)
@@ -164,13 +172,10 @@ def control_pipes():
                 score += 1
 
 def put_pipe_opening(x,y,h):
-    bound_upper = 0
-    bound_lower = 0
-    dy = 0
-    t = 0
     bound_upper = y-h-16
     bound_lower = y+h
     dy = bound_upper
+
     if dy > 0:
         for t in range(0, dy, 16):
             put_tile(x,t,PIPE_MID)
@@ -178,8 +183,10 @@ def put_pipe_opening(x,y,h):
     if dy < 64:
         for t in range(dy, 64, 16):
             put_tile(x,t,PIPE_MID)
+
     put_tile(x,bound_upper,PIPE_BOT)
     put_tile(x,bound_lower,PIPE_TOP)
+
     if not playerx + player['framew'] < x and not playerx > x+16 and playery < -player['frameh']:
             died = 1
 #    if fn.TestBoxCollision(playerx, playery, word[player.Addr()][1], word[player.Addr()][2], x, 0, 16, bound_upper+16):
@@ -188,16 +195,11 @@ def put_pipe_opening(x,y,h):
 #        died = 1
 
 def keep_score():
-    tmp = 0
-    tmp = score
-    intarray[2] = 48+(tmp % 10)
-    tmp /= 10
-    intarray[1] = 48+(tmp % 10)
-    tmp /= 10
-    intarray[0] = 48+(tmp % 10)
-    intarray[3] = 0
-#    txt.str(intarray, 0, 0)
-
+    txt.string(str(score).zfill(3), 0, 0)
+#    txt.string("this is the score\nwut!!! "+str(343), 20, 0)
+#    txt.box("oodf osdf iosdfio jsdf sdf"
+#            "iodfdsjfo sdf ids ijsdf ojdsf"
+#            "josdf sdf sdf ojsdf jos fsdf", 0, 0, 128)
 
 def handle_player():
     global clicked
@@ -215,7 +217,7 @@ def handle_player():
 
     if speedy < 32:
         speedy += 1
-    playery += (speedy / 4)
+    playery += (speedy // 4)
     if playery > 60-16:
         speedy = 0
         died = 1
@@ -236,30 +238,30 @@ def main():
         game_loop()
         game_over()
     
-    while True:
-    
-        gfx.clear()
-        ctrl.update()
-        if ctrl.a():
-            print "OIDJD"
-
-#        if ctrl.left():
-#            x -= 1
-#        if ctrl.right():
-#            x += 1
-#        if ctrl.up():
-#            y -= 1
-#        if ctrl.down():
-#            y += 1
+#    while True:
+#    
+#        gfx.clear()
+#        ctrl.update()
+#        if ctrl.a():
+#            print("OIDJD")
 #
-#        stuff += 1
-
-        #parallax(0,48,16,UNDER)
-        put_parallax_tile(0,48,16,UNDER)
-        put_tile(0, 0, PIPE_MID)
-    
-        gfx.sprite(player, x, y, stuff % 2)
-        gfx.draw()
+##        if ctrl.left():
+##            x -= 1
+##        if ctrl.right():
+##            x += 1
+##        if ctrl.up():
+##            y -= 1
+##        if ctrl.down():
+##            y += 1
+##
+##        stuff += 1
+#
+#        #parallax(0,48,16,UNDER)
+##        put_parallax_tile(0,48,16,UNDER)
+##        put_tile(0, 0, PIPE_MID)
+#    
+#        gfx.sprite(player, x, y, stuff % 2)
+#        gfx.draw()
 
     ctrl.waitkey()
 
@@ -267,5 +269,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print "Exiting..."
+        print("Exiting...")
         pass
