@@ -76,7 +76,7 @@ def title_screen():
         ctrl.update()
         xoffset += 1
 
-        gfx.clear(gfx.WHITE)
+        gfx.clear(0xb3ffff)
         put_parallax_tile(0,48,16,UNDER)
         put_parallax_tile(xoffset,56,16,FLOOR)
         put_parallax_tile(xoffset,40,8,BUSH)
@@ -111,7 +111,7 @@ def game_loop():
 
     while not died:
         ctrl.update()
-        gfx.clear(gfx.WHITE)
+        gfx.clear(0xb3ffff)
         xoffset += 1
         put_parallax_tile(0,48,16,UNDER)
         put_parallax_tile(xoffset,56,16,FLOOR)
@@ -238,31 +238,6 @@ def main():
         game_loop()
         game_over()
     
-#    while True:
-#    
-#        gfx.clear()
-#        ctrl.update()
-#        if ctrl.a():
-#            print("OIDJD")
-#
-##        if ctrl.left():
-##            x -= 1
-##        if ctrl.right():
-##            x += 1
-##        if ctrl.up():
-##            y -= 1
-##        if ctrl.down():
-##            y += 1
-##
-##        stuff += 1
-#
-#        #parallax(0,48,16,UNDER)
-##        put_parallax_tile(0,48,16,UNDER)
-##        put_tile(0, 0, PIPE_MID)
-#    
-#        gfx.sprite(player, x, y, stuff % 2)
-#        gfx.draw()
-
     ctrl.waitkey()
 
 if __name__ == "__main__":
