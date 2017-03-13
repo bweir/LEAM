@@ -1,6 +1,7 @@
 click
 pygame
 pyinstaller
+pytmx
 sh
 sphinx
 

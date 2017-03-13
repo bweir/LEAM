@@ -1,4 +1,4 @@
 import time
 
-def Sleep(milliseconds):
+def sleep(milliseconds):
     time.sleep(milliseconds/1000)

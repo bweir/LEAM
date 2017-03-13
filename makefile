@@ -1,5 +1,7 @@
-setup:
+apt:
 	sudo apt-get install -y upx-ucl
+
+setup:
 	pip install --upgrade pip setuptools wheel
 	pip install -r requirements.txt
 	python setup.py develop
@@ -12,3 +14,6 @@ clean:
 
 distclean: clean
 	rm -rf ENV
+
+uninstall:
+	pip uninstall lamemaker

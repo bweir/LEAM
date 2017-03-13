@@ -1,7 +1,24 @@
+#!/usr/bin/env python
+
+#  ______                             ____                _ 
+# |  ____|                           |  _ \              | |
+# | |__ _ __ __ _ _ __  _ __  _   _  | |_) | __ _ _ __ __| |
+# |  __| '__/ _` | '_ \| '_ \| | | | |  _ < / _` | '__/ _` |
+# | |  | | | (_| | |_) | |_) | |_| | | |_) | (_| | | | (_| |
+# |_|  |_|  \__,_| .__/| .__/ \__, | |____/ \__,_|_|  \__,_|
+#                | |   | |     __/ |                        
+#                |_|   |_|    |___/                         
+# ----------------------------------------------------------
+# A shockingly original game for the LameStation!
+# ----------------------------------------------------------
+
+from lame import fn
 from lame import gfx
 from lame import ctrl
 from lame import txt
 from lame import log
+from lame import col
+from lame import music
 
 import random
 
@@ -17,10 +34,10 @@ pressa = gfx.load('gfx/pressa.png')
 
 font = txt.load('gfx/font4x6.png', 4, 6, ' ')
 
-#log.error("This is a message")
-#log.debug("This is a message")
-#log.info("This is a message")
-#log.warn("This is a message")
+music.start()
+blk = music.load("music/blakomen.mid")
+music.play()
+
 
 PIPE_TOP = 3
 PIPE_MID = 5
@@ -35,6 +52,7 @@ UNDER = 6
 MAXPIPES = 8
 
 
+died = 0
 xoffset = 0
 xoffsetcounter = 0
 playerx = 0
@@ -56,19 +74,9 @@ clicked = 0
 
 intarray = [0]*4
 
-
-def put_parallax_tile(x, y, speed, tile):
-    t = 0
-    dx = 16 // speed - 1
-    x = (x >> dx) & int("0xF",0)
-    for t in range(0, 144, 16):
-        put_tile(t-x, y, tile)
-
-def put_tile(x, y, tile):
-    gfx.sprite(tilemap, x, y, tile)
-
 def title_screen():
     global flighttimeout
+    global xoffset
     flightstate = 0
     xoffset = 0
 
@@ -171,7 +179,18 @@ def control_pipes():
                 passed[t] = 1
                 score += 1
 
+def put_parallax_tile(x, y, speed, tile):
+    t = 0
+    dx = 16 // speed - 1
+    x = (x >> dx) & int("0xF",0)
+    for t in range(0, 144, 16):
+        put_tile(t-x, y, tile)
+
+def put_tile(x, y, tile):
+    gfx.sprite(tilemap, x, y, tile)
+
 def put_pipe_opening(x,y,h):
+    global died
     bound_upper = y-h-16
     bound_lower = y+h
     dy = bound_upper
@@ -189,10 +208,14 @@ def put_pipe_opening(x,y,h):
 
     if not playerx + player['framew'] < x and not playerx > x+16 and playery < -player['frameh']:
             died = 1
-#    if fn.TestBoxCollision(playerx, playery, word[player.Addr()][1], word[player.Addr()][2], x, 0, 16, bound_upper+16):
-#        died = 1
-#    if fn.TestBoxCollision(playerx, playery, word[player.Addr()][1], word[player.Addr()][2], x, bound_lower, 16, 64):
-#        died = 1
+
+    if col.box(playerx, playery, gfx.width(player), gfx.height(player),
+               x, 0, 16, bound_upper+16):
+        died = 1
+
+    if col.box(playerx, playery, gfx.width(player), gfx.height(player),
+               x, bound_lower, 16, 64):
+        died = 1
 
 def keep_score():
     txt.string(str(score).zfill(3), 0, 0)
@@ -206,6 +229,7 @@ def handle_player():
     global playerx, playery
     global speedx, speedy
     global flighttimeout
+    global died
     if ctrl.a():
         if not clicked:
             clicked = 1
@@ -244,5 +268,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("Exiting...")
+        log.info("Exiting...")
         pass

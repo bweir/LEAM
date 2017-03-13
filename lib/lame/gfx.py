@@ -1,8 +1,10 @@
 from lame import log
+from lame import con
 
 import pygame
 from pygame.locals import *
 
+import os
 import sys
 
 SCREEN_W = 128
@@ -21,7 +23,8 @@ QUARTERSPEED = 10
 
 composer = None
 screen = None
-inverted = False
+_invertcolor = False
+_invertscreen = False
 
 clock = pygame.time.Clock()
 speed = 0
@@ -56,7 +59,7 @@ def draw():
                 SCREEN_H*PIXEL_H),
             screen)
 
-    if inverted:
+    if _invertscreen:
         pixels = pygame.surfarray.pixels2d(screen)
         pixels ^= 2 ** 32 - 1
         del pixels
@@ -71,8 +74,8 @@ def limit(frequency):
     return
 
 def invertscreen(enabled):
-    global inverted
-    inverted = enabled
+    global _invertscreen
+    _invertscreen = enabled
 
 def sync():
     return
@@ -84,10 +87,17 @@ def load(filename, width=None, height=None):
     if filename in _images:
         return _images[filename]
 
-    log.info("Loading "+filename)
+    rootpath = os.path.abspath(con.SCRIPT)
+    filepath = os.path.join(rootpath, filename)
+    filepath = os.path.realpath(filepath)
+    if not filepath.startswith(rootpath):
+        log.error("File not found: "+filename)
+        sys.exit(1)
+
+    log.info("Loading image "+filename)
 
     d = {}
-    d['image'] = pygame.image.load(filename)
+    d['image'] = pygame.image.load(filepath)
     d['w'] = d['image'].get_width()
     d['h'] = d['image'].get_height()
 
@@ -104,7 +114,7 @@ def load(filename, width=None, height=None):
 #    d['framex'] = d['w'] // d['framew']
 #    d['framey'] = d['h'] // d['frameh']
 #
-    _images[filename] = d
+    _images[filepath] = d
     return d
 
 def wait():
@@ -114,7 +124,7 @@ def clear(color=0):
     composer.fill(color)
 
 def blit(source):
-    Sprite(source, 0, 0, 0)
+    sprite(source, 0, 0, 0)
 
 def sprite(source, x, y, frame):
     source['image'].set_colorkey(TRANSPARENT)
@@ -127,8 +137,8 @@ def sprite(source, x, y, frame):
             (xpos, ypos,source['framew'],source['frameh']))
 
 def invertcolor(enabled):
-    global inverted
-    inverted = enabled
+    global _invertcolor
+    _invertcolor = enabled
 
 def map(tilemap, levelmap, offset_x, offset_y, x1, y1, x2, y2):
     return
@@ -147,3 +157,9 @@ def textbox(stringvar, origin_x, origin_y, w, h):
 
 def setclip(clipx1, clipy1, clipx2, clipy2):
     return
+
+def width(source):
+    return source['framew']
+
+def height(source):
+    return source['frameh']
